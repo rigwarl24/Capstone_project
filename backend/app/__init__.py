@@ -1,0 +1,1 @@
+"""CodeRace backend application package."""
