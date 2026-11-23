@@ -1,0 +1,16 @@
+# Python
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# Secrets - NEVER upload (database password lives here)
+.env
+
+# Editor / OS files
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
