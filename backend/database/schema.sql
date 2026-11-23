@@ -29,7 +29,7 @@ CREATE TABLE users (
     id              INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     username        VARCHAR(30)   NOT NULL,
     email           VARCHAR(255)  NOT NULL,
-    password_hash   VARCHAR(255)  NOT NULL,          -- bcrypt hash, never the plain password
+    password_hash   VARCHAR(255)  NOT NULL,          -- salted scrypt hash, never the plain password
     elo_rating      INT           NOT NULL DEFAULT 1000,
 
     -- Rank tier is calculated automatically from elo_rating,

@@ -10,6 +10,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from .database import engine
+from .routers import auth
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -18,6 +19,8 @@ app = FastAPI(
     description="Database & REST API for CodeRace: Real-Time Coding Duels",
     version="0.1.0",
 )
+
+app.include_router(auth.router)
 
 
 @app.get("/api/health", tags=["Health"])
