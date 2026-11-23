@@ -73,3 +73,70 @@ class LeaderboardEntry(BaseModel):
     matches_played: int
     wins: int
     win_rate: float
+
+    
+
+class PublicTestCase(BaseModel):
+    input: list
+    expected: object
+
+
+class FullTestCase(PublicTestCase):
+    hidden: bool
+
+
+class ProblemPublic(BaseModel):
+    """What players see: description, starter code and only the visible tests."""
+    id: int
+    slug: str
+    title: str
+    description: str
+    difficulty: str
+    game_mode: str
+    function_name: str
+    starter_code: str
+    time_limit_ms: int
+    memory_limit_mb: int
+    visible_tests: list[PublicTestCase]
+
+
+class ProblemWithTests(ProblemPublic):
+    """For the code-execution engine only: includes the hidden tests."""
+    all_tests: list[FullTestCase]
+
+
+class MatchCreate(BaseModel):
+    player1_username: str
+    player2_username: str
+    game_mode: str = Field(default="speed_duel", pattern="^(speed_duel|bug_hunt|optimization)$")
+    difficulty: str | None = Field(default=None, pattern="^(Easy|Medium|Hard)$")
+    problem_id: int | None = None
+
+
+class MatchFinish(BaseModel):
+    winner_username: str | None = Field(
+        default=None, description="Leave empty (null) for a draw or an abandoned match")
+    abandoned: bool = Field(
+        default=False, description="True if the match ended early (e.g. a player left)")
+
+
+class MatchPlayer(BaseModel):
+    id: int
+    username: str
+    elo_before: int
+    elo_change: int | None
+
+
+class MatchDetail(BaseModel):
+    id: int
+    status: str
+    game_mode: str
+    problem_id: int
+    problem_title: str
+    difficulty: str
+    player1: MatchPlayer
+    player2: MatchPlayer
+    winner_username: str | None
+    started_at: datetime
+    ended_at: datetime | None
+    duration_seconds: int | None

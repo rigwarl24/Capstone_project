@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 1440  # 24 hours
 
+    # Shared secret for server-to-server calls (real-time engine -> this API)
+    internal_api_key: str
+
     model_config = SettingsConfigDict(env_file=ENV_FILE, env_file_encoding="utf-8")
 
 

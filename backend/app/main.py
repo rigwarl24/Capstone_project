@@ -10,7 +10,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from .database import engine
-from .routers import auth, leaderboard, users
+from .routers import auth, leaderboard, matches, problems, users
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -23,6 +23,8 @@ app = FastAPI(
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(leaderboard.router)
+app.include_router(problems.router)
+app.include_router(matches.router)
 
 
 @app.get("/api/health", tags=["Health"])

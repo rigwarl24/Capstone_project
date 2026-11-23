@@ -1,10 +1,12 @@
 """Shared FastAPI dependencies."""
+import hmac
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, Header, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import Connection, text
 
+from .config import settings
 from .database import get_db
 from .security import decode_access_token
 
@@ -38,3 +40,15 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: DbConnec
 
 
 CurrentUser = Annotated[dict, Depends(get_current_user)]
+
+
+def require_internal_key(x_internal_key: Annotated[str | None, Header()] = None) -> None:
+    """Allow only trusted servers (e.g. the real-time engine) that send X-Internal-Key."""
+    if x_internal_key is None or not hmac.compare_digest(
+        x_internal_key.encode(), settings.internal_api_key.encode()
+    ):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Missing or invalid internal API key")
+
+
+InternalOnly = Depends(require_internal_key)
