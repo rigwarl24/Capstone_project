@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign up – CodeRace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>
+tailwind.config = { darkMode: "class", theme: { extend: { fontFamily: {
+  sans: ["Inter", "system-ui", "sans-serif"], mono: ["JetBrains Mono", "ui-monospace", "monospace"] } } } };
+</script>
+<style type="text/tailwindcss">
+@layer components {
+  .card { @apply rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900; }
+  .field { @apply w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-900; }
+  .btn-primary { @apply inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40; }
+  .btn-ghost { @apply inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800; }
+  .th { @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400; }
+  .td { @apply px-4 py-3.5; }
+}
+</style>
+<script src="js/common.js"></script>
+</head>
+<body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
+<header id="nav"></header>
+<main class="mx-auto flex max-w-md flex-col px-4 pt-16">
+  <div class="card p-8">
+    <h1 class="text-2xl font-bold tracking-tight">Create your account</h1>
+    <p class="mt-1 text-sm text-slate-500">Start at 1000 Elo and prove your skill.</p>
+    <form id="f" class="mt-6 space-y-4">
+      <div><label for="username" class="mb-1.5 block text-sm font-medium">Username</label>
+        <input id="username" required minlength="3" maxlength="20" autocomplete="username" class="field"></div>
+      <div><label for="email" class="mb-1.5 block text-sm font-medium">Email</label>
+        <input id="email" type="email" required autocomplete="email" class="field"></div>
+      <div><label for="password" class="mb-1.5 block text-sm font-medium">Password</label>
+        <input id="password" type="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters" class="field"></div>
+      <div><label for="confirm" class="mb-1.5 block text-sm font-medium">Confirm password</label>
+        <input id="confirm" type="password" required autocomplete="new-password" class="field"></div>
+      <p id="err" role="alert" class="min-h-[1.25rem] text-sm text-red-500"></p>
+      <button class="btn-primary w-full">Create account</button>
+    </form>
+  </div>
+  <p class="mt-6 text-center text-sm text-slate-500">Already registered? <a class="font-medium text-indigo-500 hover:underline" href="login.html">Log in</a></p>
+</main>
+<script>
+document.getElementById('f').onsubmit = async e => {
+  e.preventDefault();
+  if (password.value !== confirm.value) return err.textContent = 'Passwords do not match.';
+  try { await api.register(username.value.trim(), email.value.trim(), password.value); location.href = 'profile.html'; }
+  catch (x) { err.textContent = x.message; }
+};
+</script>
+</body></html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leaderboard – CodeRace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>
+tailwind.config = { darkMode: "class", theme: { extend: { fontFamily: {
+  sans: ["Inter", "system-ui", "sans-serif"], mono: ["JetBrains Mono", "ui-monospace", "monospace"] } } } };
+</script>
+<style type="text/tailwindcss">
+@layer components {
+  .card { @apply rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900; }
+  .field { @apply w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-900; }
+  .btn-primary { @apply inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40; }
+  .btn-ghost { @apply inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800; }
+  .th { @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400; }
+  .td { @apply px-4 py-3.5; }
+}
+</style>
+<script src="js/common.js"></script>
+</head>
+<body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
+<header id="nav"></header>
+<main class="mx-auto max-w-4xl px-4 py-12 sm:px-6">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div><h1 class="text-3xl font-bold tracking-tight">Global leaderboard</h1>
+      <p class="mt-1 text-sm text-slate-500">Top players ranked by Elo rating.</p></div>
+    <input id="search" placeholder="Search players" class="field !w-56" aria-label="Search players">
+  </div>
+  <div class="card mt-6 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="border-b border-slate-200 dark:border-slate-800"><tr>
+        <th class="th w-16">Rank</th><th class="th">Player</th><th class="th">Tier</th><th class="th text-right">Elo</th><th class="th text-right">W / L</th></tr></thead>
+      <tbody id="rows" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
+    </table>
+  </div>
+</main>
+<footer id="footer"></footer>
+<script>
+let list = [];
+function render() {
+  const me = getUser(), q = search.value.trim().toLowerCase();
+  rows.innerHTML = list.map((p, i) => ({ ...p, pos: i + 1 })).filter(p => p.username.toLowerCase().includes(q)).map(p => `
+    <tr class="${me && me.username === p.username ? 'bg-indigo-500/5' : ''}">
+      <td class="td font-mono ${p.pos <= 3 ? 'font-bold text-indigo-500' : 'text-slate-500'}">${p.pos}</td>
+      <td class="td font-medium">${p.username}${me && me.username === p.username ? ' <span class="text-xs text-slate-400">(you)</span>' : ''}</td>
+      <td class="td">${rankBadge(p.elo)}</td><td class="td text-right font-mono">${p.elo}</td>
+      <td class="td text-right font-mono text-slate-500">${p.wins} / ${p.losses}</td></tr>`).join('')
+    || '<tr><td colspan="5" class="td text-center text-slate-500">No players found.</td></tr>';
+}
+search.oninput = render;
+api.leaderboard().then(l => { list = l; render(); });
+</script>
+</body></html>

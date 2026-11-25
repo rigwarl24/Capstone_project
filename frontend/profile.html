@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile – CodeRace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>
+tailwind.config = { darkMode: "class", theme: { extend: { fontFamily: {
+  sans: ["Inter", "system-ui", "sans-serif"], mono: ["JetBrains Mono", "ui-monospace", "monospace"] } } } };
+</script>
+<style type="text/tailwindcss">
+@layer components {
+  .card { @apply rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900; }
+  .field { @apply w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-900; }
+  .btn-primary { @apply inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40; }
+  .btn-ghost { @apply inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800; }
+  .th { @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400; }
+  .td { @apply px-4 py-3.5; }
+}
+</style>
+<script src="js/common.js"></script>
+</head>
+<body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
+<header id="nav"></header>
+<main class="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+  <section class="card flex flex-col gap-6 p-6 sm:flex-row sm:items-center">
+    <div id="avatar" class="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-3xl font-bold text-white"></div>
+    <div class="flex-1">
+      <div class="flex flex-wrap items-center gap-3"><h1 id="name" class="text-2xl font-bold tracking-tight"></h1><span id="badge"></span></div>
+      <p id="eloLine" class="mt-1 text-sm text-slate-500"></p>
+      <div class="mt-4 h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800"><div id="prog" class="h-2 rounded-full bg-indigo-500" style="width:0%"></div></div>
+      <p id="progTxt" class="mt-1.5 text-xs text-slate-500"></p>
+    </div>
+    <a href="arena.html" class="btn-primary">Find Match</a>
+  </section>
+
+  <section id="stats" class="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4"></section>
+
+  <h2 class="mb-3 mt-10 text-lg font-semibold">Match history</h2>
+  <div class="card overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="border-b border-slate-200 dark:border-slate-800"><tr>
+        <th class="th">Date</th><th class="th">Opponent</th><th class="th">Mode</th><th class="th">Result</th><th class="th text-right">Elo</th></tr></thead>
+      <tbody id="hist" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
+    </table>
+  </div>
+</main>
+<footer id="footer"></footer>
+<script>
+(async () => {
+  const u = getUser(); if (!u) return location.href = 'login.html';
+  const total = u.wins + u.losses, rate = total ? Math.round(u.wins / total * 100) : 0;
+  avatar.textContent = u.username[0].toUpperCase();
+  name.textContent = u.username; badge.innerHTML = rankBadge(u.elo);
+  eloLine.textContent = `${u.elo} Elo`;
+  const next = RANKS.find(r => r.min > u.elo), cur = rankInfo(u.elo);
+  if (next) { prog.style.width = ((u.elo - cur.min) / (next.min - cur.min) * 100) + '%'; progTxt.textContent = `${next.min - u.elo} Elo to ${next.name}`; }
+  else { prog.style.width = '100%'; progTxt.textContent = 'Highest rank reached'; }
+  const card = (l, v) => `<div class="card p-5"><p class="text-xs font-medium uppercase tracking-wider text-slate-500">${l}</p><p class="mt-1 text-2xl font-bold">${v}</p></div>`;
+  stats.innerHTML = card('Elo rating', u.elo) + card('Duels played', total) + card('Wins', u.wins) + card('Win rate', rate + '%');
+  const h = await api.history();
+  hist.innerHTML = h.map(m => `<tr>
+    <td class="td text-slate-500">${m.date}</td><td class="td font-medium">${m.opponent}</td><td class="td">${m.mode}</td>
+    <td class="td font-medium ${m.result === 'win' ? 'text-green-500' : 'text-red-500'}">${m.result === 'win' ? 'Win' : 'Loss'}</td>
+    <td class="td text-right font-mono ${m.delta > 0 ? 'text-green-500' : 'text-red-500'}">${m.delta > 0 ? '+' : ''}${m.delta}</td></tr>`).join('');
+})();
+</script>
+</body></html>
